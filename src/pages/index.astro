@@ -1,0 +1,11 @@
+---
+import { getImage } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import heroSrc from '../assets/home/hero.jpg';
+
+const hero = await getImage({ src: heroSrc, width: 2000, format: 'webp' });
+---
+
+<Layout title="Inicio" transparentHeader showFooter={false}>
+	<div class="hero" style={`background-image: url(${hero.src})`} role="img" aria-label="Ana Cantalapiedra"></div>
+</Layout>

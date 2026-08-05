@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import Gallery from '../../components/Gallery.astro';
+import { getProjectImages } from '../../lib/projectImages';
+
+export async function getStaticPaths() {
+	const proyectos = await getCollection('proyectos');
+	return proyectos.map((proyecto) => ({
+		params: { slug: proyecto.id },
+		props: { proyecto },
+	}));
+}
+
+const { proyecto } = Astro.props;
+const { Content } = await render(proyecto);
+const images = getProjectImages(proyecto.id, proyecto.data.perImageCaptions);
+---
+
+<Layout title={proyecto.data.title}>
+	<div class="container">
+		<div class="project-header">
+			<h1>{proyecto.data.title}</h1>
+			{proyecto.data.meta && <p class="project-header__meta">{proyecto.data.meta}</p>}
+		</div>
+
+		<div class="project-body">
+			<Content />
+		</div>
+
+		{
+			proyecto.data.links && proyecto.data.links.length > 0 && (
+				<ul class="project-links">
+					{proyecto.data.links.map((link) => (
+						<li>
+							<a href={link.url} target="_blank" rel="noopener noreferrer">
+								{link.label}
+							</a>
+						</li>
+					))}
+				</ul>
+			)
+		}
+
+		<Gallery images={images} />
+	</div>
+</Layout>

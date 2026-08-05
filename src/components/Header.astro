@@ -1,0 +1,33 @@
+---
+interface Props {
+	transparent?: boolean;
+	currentPath: string;
+}
+
+const { transparent = false, currentPath } = Astro.props;
+
+const links = [
+	{ href: '/fotografia/', label: 'Fotografía' },
+	{ href: '/ilustracion/', label: 'Ilustración' },
+	{ href: '/sobre-mi/', label: 'Sobre mí' },
+];
+---
+
+<header class:list={['site-header', { 'site-header--inline': !transparent }]}>
+	<div class="container site-header__row">
+		<a class="site-header__name" href="/">Ana Cantalapiedra</a>
+		<nav>
+			<ul class="site-nav">
+				{
+					links.map((link) => (
+						<li>
+							<a href={link.href} aria-current={currentPath.startsWith(link.href) ? 'page' : undefined}>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+	</div>
+</header>
