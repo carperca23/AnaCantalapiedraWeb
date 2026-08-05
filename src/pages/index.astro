@@ -2,10 +2,27 @@
 import { getImage } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import heroSrc from '../assets/home/hero.jpg';
+import heroFotoSrc from '../assets/home/hero-foto.jpg';
+import heroIlustracionSrc from '../assets/home/hero-ilustracion.jpg';
 
 const hero = await getImage({ src: heroSrc, width: 2000, format: 'webp' });
+const heroFoto = await getImage({ src: heroFotoSrc, width: 1400, format: 'webp' });
+const heroIlustracion = await getImage({ src: heroIlustracionSrc, width: 1400, format: 'webp' });
 ---
 
 <Layout title="Inicio" transparentHeader showFooter={false}>
-	<div class="hero" style={`background-image: url(${hero.src})`} role="img" aria-label="Ana Cantalapiedra"></div>
+	<div class="hero" role="img" aria-label="Ana Cantalapiedra — fotografía e ilustración">
+		<!-- Wide screens: the artist's own composite, full-bleed. -->
+		<div class="hero__flat" style={`background-image: url(${hero.src})`}></div>
+		<!-- Narrow screens: the same two photos, each filling half the screen
+		     (object-fit: cover) so the background is always fully covered. -->
+		<div class="hero__split">
+			<div class="hero__split-panel">
+				<img src={heroFoto.src} alt="" />
+			</div>
+			<div class="hero__split-panel">
+				<img src={heroIlustracion.src} alt="" />
+			</div>
+		</div>
+	</div>
 </Layout>

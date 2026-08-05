@@ -100,11 +100,17 @@ function main() {
 		total += count;
 	}
 
-	// Home hero
+	// Home hero — the flat composite (wide screens) plus the two source
+	// halves that make it up (stacked on narrow screens, see hero-split.astro)
 	resetDir(DEST_HOME);
 	copyFileSync(join(SOURCE_ROOT, 'Pagina de entrada', 'Pag_Principal.jpg'), join(DEST_HOME, 'hero.jpg'));
-	console.log('✔ home: 1 imagen');
-	total += 1;
+	copyFileSync(join(SOURCE_ROOT, 'Pagina de entrada', 'Nubetela 1.jpg'), join(DEST_HOME, 'hero-foto.jpg'));
+	copyFileSync(
+		join(SOURCE_ROOT, 'Pagina de entrada', '1A_LosPajarossuenanqueandan.jpg'),
+		join(DEST_HOME, 'hero-ilustracion.jpg'),
+	);
+	console.log('✔ home: 3 imágenes');
+	total += 3;
 
 	// Sobre mí portrait
 	resetDir(DEST_SOBRE_MI);

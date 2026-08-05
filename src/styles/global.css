@@ -32,6 +32,7 @@ body {
 
 img {
 	max-width: 100%;
+	height: auto;
 	display: block;
 }
 
@@ -148,9 +149,7 @@ p {
 
 .hero {
 	position: relative;
-	min-height: 100svh;
-	background-size: cover;
-	background-position: center;
+	width: 100%;
 }
 
 .hero::after {
@@ -159,6 +158,42 @@ p {
 	inset: 0;
 	background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent 35%);
 	pointer-events: none;
+}
+
+/* Narrow screens (default): the two source photos stacked, each filling
+   half the viewport height via object-fit: cover — background is always
+   fully covered, never blank, and each photo is cropped on its own
+   instead of the whole wide composite being crushed into a tall screen. */
+.hero__flat {
+	display: none;
+}
+
+.hero__split-panel {
+	position: relative;
+	height: 50svh;
+	overflow: hidden;
+}
+
+.hero__split-panel img {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* Wide screens: the artist's own composite image, full-bleed. */
+@media (min-width: 40rem) {
+	.hero__flat {
+		display: block;
+		min-height: 100svh;
+		background-size: cover;
+		background-position: center;
+	}
+
+	.hero__split {
+		display: none;
+	}
 }
 
 /* Footer */
@@ -369,7 +404,7 @@ p {
 
 .about {
 	display: grid;
-	grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+	grid-template-columns: minmax(16rem, 32%) minmax(0, 1fr);
 	gap: var(--space-4);
 	padding-block: var(--space-4);
 	align-items: start;
