@@ -66,6 +66,36 @@ p {
 	margin: 0 0 var(--space-2);
 }
 
+/* Scroll-reveal entrance for the masonry grids below (project covers,
+   project galleries) — the blur/scale-in the React Bits <Masonry> does
+   with a gsap stagger on mount, done here per-item as it individually
+   crosses the viewport (IntersectionObserver in Layout.astro), which
+   reads as a natural stagger without needing an index-based delay. */
+.reveal {
+	opacity: 0;
+	transform: scale(0.94);
+	filter: blur(6px);
+	transition:
+		opacity 0.6s ease,
+		transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+		filter 0.6s ease;
+}
+
+.reveal--visible {
+	opacity: 1;
+	transform: scale(1);
+	filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.reveal {
+		opacity: 1;
+		transform: none;
+		filter: none;
+		transition: none;
+	}
+}
+
 .container {
 	max-width: var(--max-width);
 	margin-inline: auto;
@@ -526,7 +556,7 @@ p {
 
 .site-footer {
 	border-top: 1px solid var(--color-secondary);
-	padding-block: var(--space-4);
+	padding-block: var(--space-4) var(--space-3);
 	margin-top: var(--space-4);
 	color: var(--color-primary);
 }
@@ -553,31 +583,60 @@ p {
 	text-decoration: underline;
 }
 
-/* Project grid */
+/* Small, muted credit line — separated from the artist's own contact
+   details above so it reads as site metadata, not part of her voice. */
+.site-footer__credit {
+	margin-top: var(--space-3);
+	padding-top: var(--space-2);
+	border-top: 1px solid var(--color-secondary);
+	text-align: center;
+	font-family: var(--font-body);
+	font-size: 0.8rem;
+	color: var(--color-primary);
+	opacity: 0.55;
+}
 
+.site-footer__credit a {
+	color: inherit;
+	opacity: 1;
+	text-decoration: underline;
+	text-decoration-color: currentColor;
+	transition: opacity 0.2s ease;
+}
+
+.site-footer__credit a:hover {
+	opacity: 0.7;
+}
+
+/* Project grid — Pinterest-style masonry (CSS columns rather than the
+   React Bits <Masonry> version's JS bin-packing + absolute positioning:
+   with real image dimensions available at build time, letting each cover
+   keep its natural aspect ratio and flow down a CSS column gives the same
+   look with no per-item pixel math or resize-observer reflow needed). */
 .project-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
-	gap: var(--space-3);
+	columns: 16rem 4;
+	column-gap: var(--space-3);
 	padding-block: var(--space-3);
 }
 
 .project-card {
+	display: block;
+	width: 100%;
+	break-inside: avoid;
+	margin-bottom: var(--space-3);
 	text-decoration: none;
 	color: inherit;
-	display: block;
 }
 
 .project-card__thumb {
-	aspect-ratio: 4 / 5;
 	overflow: hidden;
 	background: var(--color-secondary);
 }
 
 .project-card__thumb img {
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
+	height: auto;
+	display: block;
 	transition: transform 0.4s ease;
 }
 
@@ -625,31 +684,32 @@ p {
 	flex-wrap: wrap;
 }
 
-/* Gallery + lightbox */
+/* Gallery + lightbox — same CSS-columns masonry as .project-grid above. */
 
 .gallery {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
-	gap: var(--space-2);
+	columns: 18rem 4;
+	column-gap: var(--space-2);
 	padding-bottom: var(--space-4);
 }
 
 .gallery__item {
-	display: flex;
-	flex-direction: column;
+	display: block;
+	width: 100%;
+	break-inside: avoid;
+	margin-bottom: var(--space-2);
 	border: 0;
 	background: none;
 	padding: 0;
 	cursor: zoom-in;
 	overflow: hidden;
 	font: inherit;
+	text-align: left;
 }
 
 .gallery__item img {
 	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	aspect-ratio: 4 / 5;
+	height: auto;
+	display: block;
 	transition: transform 0.4s ease;
 }
 
@@ -658,6 +718,7 @@ p {
 }
 
 .gallery__caption {
+	display: block;
 	font-size: 0.85rem;
 	color: var(--color-primary);
 	margin-top: var(--space-1);

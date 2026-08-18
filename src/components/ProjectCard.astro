@@ -11,7 +11,7 @@ interface Props {
 const { href, title, cover } = Astro.props;
 ---
 
-<a class="project-card" href={href}>
+<a class="project-card reveal" href={href}>
 	<div class="project-card__thumb">
 		<Image src={cover} alt="" width={600} format="webp" />
 	</div>

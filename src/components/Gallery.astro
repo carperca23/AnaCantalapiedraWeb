@@ -23,7 +23,7 @@ const fullImages = await Promise.all(
 		images.map((img, i) => (
 			<button
 				type="button"
-				class="gallery__item"
+				class="gallery__item reveal"
 				data-full={fullImages[i].src}
 				data-caption={img.caption ?? ''}
 				aria-label={img.caption ? `Ampliar imagen: ${img.caption}` : 'Ampliar imagen'}
