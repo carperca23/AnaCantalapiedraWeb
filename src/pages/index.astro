@@ -1,28 +1,121 @@
 ---
-import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
-import heroSrc from '../assets/home/hero.jpg';
-import heroFotoSrc from '../assets/home/hero-foto.jpg';
-import heroIlustracionSrc from '../assets/home/hero-ilustracion.jpg';
+import CloudShader from '../components/CloudShader.astro';
+import BlurText from '../components/BlurText.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import { getProjectCover } from '../lib/projectImages';
+import retrato from '../assets/sobre-mi/retrato.jpg';
 
-const hero = await getImage({ src: heroSrc, width: 2000, format: 'webp' });
-const heroFoto = await getImage({ src: heroFotoSrc, width: 1400, format: 'webp' });
-const heroIlustracion = await getImage({ src: heroIlustracionSrc, width: 1400, format: 'webp' });
+const fotografia = (await getCollection('proyectos', ({ data }) => data.category === 'fotografia')).sort(
+	(a, b) => a.data.order - b.data.order,
+);
+const ilustracion = (await getCollection('proyectos', ({ data }) => data.category === 'ilustracion')).sort(
+	(a, b) => a.data.order - b.data.order,
+);
 ---
 
-<Layout title="Inicio" transparentHeader showFooter={false}>
-	<div class="hero" role="img" aria-label="Ana Cantalapiedra — fotografía e ilustración">
-		<!-- Wide screens: the artist's own composite, full-bleed. -->
-		<div class="hero__flat" style={`background-image: url(${hero.src})`}></div>
-		<!-- Narrow screens: the same two photos, each filling half the screen
-		     (object-fit: cover) so the background is always fully covered. -->
-		<div class="hero__split">
-			<div class="hero__split-panel">
-				<img src={heroFoto.src} alt="" />
+<Layout title="Inicio" transparentHeader>
+	<div id="inicio" class="hero">
+		<CloudShader speed={0.6} count={5} cloudColor="#dcdcdc" skyTopColor="#34424e" skyBottomColor="#7f93a3">
+			<div class="hero__title">
+				<BlurText text="Ana Cantalapiedra" tag="h1" animateBy="letters" direction="top" delay={60} />
+				<p>Fotografía &middot; Ilustración</p>
 			</div>
-			<div class="hero__split-panel">
-				<img src={heroIlustracion.src} alt="" />
+		</CloudShader>
+	</div>
+
+	<section id="fotografia" class="page-section">
+		<div class="container">
+			<h2>Fotografía</h2>
+			<div class="project-grid">
+				{
+					fotografia.map((proyecto) => {
+						const cover = getProjectCover(proyecto.id);
+						return (
+							cover && (
+								<ProjectCard href={`/proyectos/${proyecto.id}/`} title={proyecto.data.title} cover={cover} />
+							)
+						);
+					})
+				}
 			</div>
 		</div>
-	</div>
+	</section>
+
+	<section id="ilustracion" class="page-section">
+		<div class="container">
+			<h2>Ilustración</h2>
+			<div class="project-grid">
+				{
+					ilustracion.map((proyecto) => {
+						const cover = getProjectCover(proyecto.id);
+						return (
+							cover && (
+								<ProjectCard href={`/proyectos/${proyecto.id}/`} title={proyecto.data.title} cover={cover} />
+							)
+						);
+					})
+				}
+			</div>
+		</div>
+	</section>
+
+	<section id="sobre-mi" class="page-section">
+		<div class="container about">
+			<div>
+				<Image src={retrato} alt="Ana Cantalapiedra" width={600} format="webp" />
+				<p style="margin-top: 0.5rem">
+					<a href="https://vimeo.com/127186435" target="_blank" rel="noopener noreferrer">Ver vídeo ↗</a>
+				</p>
+			</div>
+
+			<div>
+				<h2>Sobre mí</h2>
+
+				<p>
+					Me interesa aquello que suele pasar desapercibido por la inercia de la rutina. A través de mi
+					trabajo, intento detener el tiempo en estas pequeñas cosas y transformarlas en algo
+					extraordinario, construyendo relatos visuales y reflexiones íntimas.
+				</p>
+				<p>
+					Mi lenguaje se sitúa en la frontera donde convergen la fotografía, el dibujo y las artes
+					plásticas. No me limito al registro documental de la cámara; exploro la narrativa a través de
+					la secuencia fotográfica y siento una necesidad constante de la intervención directa sobre la
+					imagen.
+				</p>
+				<p>
+					Investigo la fusión de disciplinas. Esta experimentación me permite generar atmósferas
+					sugerentes y piezas cargadas de un lirismo muy personal.
+				</p>
+
+				<h3>Biografía</h3>
+				<p>
+					Nací en Madrid en 1971, aunque mi trayectoria vital y profesional se ha desarrollado
+					fundamentalmente en el sur. Soy Licenciada en Bellas Artes por la Universidad de Sevilla y
+					titulada como Técnico Superior de Fotografía en la Escuela de Arte de la misma ciudad.
+				</p>
+				<p>
+					En la actualidad, compagino mi desarrollo artístico e investigador con mi vocación docente,
+					trabajando como profesora de artes plásticas y diseño en la Escuela de Arte de Sevilla.
+				</p>
+
+				<h3>Publicaciones</h3>
+				<p>
+					2022. Cantalapiedra Navarrete, A. (2022). <em>Los pájaros sueñan que andan</em> (1.ª ed.).
+					Platero Coolbook.
+					<br />
+					<a
+						href="https://www.plateroeditorial.es/libro/los-pajaros-suenan-que-andan_143219/"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						plateroeditorial.es ↗
+					</a>
+				</p>
+				<p>2021. Cantalapiedra Navarrete, A. (2021). <em>Con la cabeza en las nubes</em>. Amazon KDP.</p>
+			</div>
+		</div>
+	</section>
 </Layout>

@@ -1,0 +1,189 @@
+---
+// Vanilla-JS/CSS port of React Bits' "BlurText" component
+// (https://reactbits.dev/text-animations/blur-text), adapted to Astro's
+// no-framework convention (see CloudShader.astro / Gallery.astro for the
+// same inline-<script> pattern) instead of pulling in React + motion.
+// Each letter/word keyframes blur(10px)->blur(5px)->blur(0), fading and
+// sliding in, staggered by `delay` per unit — same easing shape as the
+// original's two-step animate-to array.
+interface Props {
+	text: string;
+	tag?: 'h1' | 'h2' | 'p' | 'span' | 'div';
+	animateBy?: 'words' | 'letters';
+	direction?: 'top' | 'bottom';
+	delay?: number;
+	stepDuration?: number;
+	threshold?: number;
+	rootMargin?: string;
+	class?: string;
+}
+
+const {
+	text,
+	tag: Tag = 'p',
+	animateBy = 'words',
+	direction = 'top',
+	delay = 200,
+	stepDuration = 0.35,
+	threshold = 0.1,
+	rootMargin = '0px',
+	class: className,
+} = Astro.props;
+
+const words = text.split(' ').filter((w) => w.length > 0);
+const totalDuration = stepDuration * 2;
+
+let letterIndex = 0;
+const wordGroups = words.map((word) =>
+	[...word].map((char) => {
+		const i = letterIndex;
+		letterIndex += 1;
+		return { char, i };
+	}),
+);
+const wordUnits = words.map((word, i) => ({ word, i }));
+---
+
+<Tag
+	class:list={['blur-text', `blur-text--${direction}`, className]}
+	style={`--blur-text-duration:${totalDuration}s`}
+	data-threshold={threshold}
+	data-root-margin={rootMargin}
+>
+	{
+		animateBy === 'letters'
+			? wordGroups.map((letters, wi) => (
+					<>
+						<span class="blur-text__word">
+							{letters.map(({ char, i }) => (
+								<span class="blur-text__unit" style={`animation-delay:${(i * delay) / 1000}s`}>
+									{char}
+								</span>
+							))}
+						</span>
+						{wi < wordGroups.length - 1 && ' '}
+					</>
+				))
+			: wordUnits.map(({ word, i }, wi) => (
+					<>
+						<span
+							class="blur-text__word blur-text__unit"
+							style={`animation-delay:${(i * delay) / 1000}s`}
+						>
+							{word}
+						</span>
+						{wi < wordUnits.length - 1 && ' '}
+					</>
+				))
+	}
+</Tag>
+
+<script>
+	const observed = new WeakSet();
+
+	document.querySelectorAll('.blur-text').forEach((el) => {
+		if (observed.has(el)) return;
+		observed.add(el);
+
+		const threshold = Number(el.getAttribute('data-threshold')) || 0.1;
+		const rootMargin = el.getAttribute('data-root-margin') || '0px';
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					el.classList.add('in-view');
+					observer.unobserve(el);
+				}
+			},
+			{ threshold, rootMargin },
+		);
+		observer.observe(el);
+	});
+</script>
+
+<style>
+	.blur-text {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin: 0;
+	}
+
+	.blur-text__word {
+		display: inline-block;
+		white-space: nowrap;
+	}
+
+	.blur-text__word:not(:last-child) {
+		margin-right: 0.25em;
+	}
+
+	.blur-text__unit {
+		display: inline-block;
+		opacity: 0;
+		filter: blur(10px);
+		transform: translateY(-50px);
+		animation-duration: var(--blur-text-duration, 0.7s);
+		animation-timing-function: linear;
+		animation-fill-mode: forwards;
+		animation-play-state: paused;
+	}
+
+	.blur-text--bottom .blur-text__unit {
+		transform: translateY(50px);
+	}
+
+	.blur-text.in-view .blur-text__unit {
+		animation-name: blur-text-in-top;
+		animation-play-state: running;
+	}
+
+	.blur-text--bottom.in-view .blur-text__unit {
+		animation-name: blur-text-in-bottom;
+	}
+
+	@keyframes blur-text-in-top {
+		0% {
+			opacity: 0;
+			filter: blur(10px);
+			transform: translateY(-50px);
+		}
+		50% {
+			opacity: 0.5;
+			filter: blur(5px);
+			transform: translateY(5px);
+		}
+		100% {
+			opacity: 1;
+			filter: blur(0);
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes blur-text-in-bottom {
+		0% {
+			opacity: 0;
+			filter: blur(10px);
+			transform: translateY(50px);
+		}
+		50% {
+			opacity: 0.5;
+			filter: blur(5px);
+			transform: translateY(-5px);
+		}
+		100% {
+			opacity: 1;
+			filter: blur(0);
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.blur-text__unit {
+			animation: none !important;
+			opacity: 1;
+			filter: none;
+			transform: none;
+		}
+	}
+</style>

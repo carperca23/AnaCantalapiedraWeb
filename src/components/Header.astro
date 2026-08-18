@@ -1,28 +1,37 @@
 ---
 interface Props {
 	transparent?: boolean;
-	currentPath: string;
 }
 
-const { transparent = false, currentPath } = Astro.props;
+const { transparent = false } = Astro.props;
 
 const links = [
-	{ href: '/fotografia/', label: 'Fotografía' },
-	{ href: '/ilustracion/', label: 'Ilustración' },
-	{ href: '/sobre-mi/', label: 'Sobre mí' },
+	{ href: '/#fotografia', label: 'Fotografía' },
+	{ href: '/#ilustracion', label: 'Ilustración' },
+	{ href: '/#sobre-mi', label: 'Sobre mí' },
 ];
 ---
 
 <header class:list={['site-header', { 'site-header--inline': !transparent }]}>
 	<div class="container site-header__row">
-		<a class="site-header__name" href="/">Ana Cantalapiedra</a>
-		<nav>
-			<ul class="site-nav">
+		<a class="site-header__name" href="/#inicio">Ana Cantalapiedra</a>
+		<nav aria-label="Principal">
+			<div class="sm-prelayers" aria-hidden="true">
+				<span class="sm-prelayer sm-prelayer--1" />
+				<span class="sm-prelayer sm-prelayer--2" />
+			</div>
+			<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="pill-nav-menu">
+				<span class="nav-toggle__bar" />
+				<span class="nav-toggle__bar" />
+				<span class="nav-toggle__bar" />
+			</button>
+			<ul class="pill-nav" id="pill-nav-menu">
 				{
-					links.map((link) => (
-						<li>
-							<a href={link.href} aria-current={currentPath.startsWith(link.href) ? 'page' : undefined}>
-								{link.label}
+					links.map((link, i) => (
+						<li style={`--sm-i:${i}`}>
+							<a class="pill" href={link.href}>
+								<span class="pill__fill" aria-hidden="true" />
+								<span class="pill__label">{link.label}</span>
 							</a>
 						</li>
 					))
@@ -31,3 +40,49 @@ const links = [
 		</nav>
 	</div>
 </header>
+
+{
+	transparent && (
+		<script>
+			const header = document.querySelector('.site-header');
+			const hero = document.querySelector('.hero');
+			if (header && hero) {
+				const onScroll = () => {
+					header.classList.toggle('site-header--scrolled', window.scrollY > hero.offsetHeight - header.offsetHeight);
+				};
+				onScroll();
+				window.addEventListener('scroll', onScroll, { passive: true });
+			}
+		</script>
+	)
+}
+
+<script>
+	const toggle = document.querySelector('.nav-toggle');
+	const menu = document.querySelector('.pill-nav');
+	const prelayers = document.querySelector('.sm-prelayers');
+
+	if (toggle && menu) {
+		const setOpen = (isOpen) => {
+			toggle.classList.toggle('is-active', isOpen);
+			toggle.setAttribute('aria-expanded', String(isOpen));
+			menu.classList.toggle('is-open', isOpen);
+			prelayers?.classList.toggle('is-open', isOpen);
+		};
+
+		const close = () => setOpen(false);
+
+		toggle.addEventListener('click', () => setOpen(!menu.classList.contains('is-open')));
+
+		menu.querySelectorAll('a').forEach((link) => link.addEventListener('click', close));
+
+		document.addEventListener('click', (event) => {
+			if (!(event.target instanceof Node)) return;
+			if (!menu.contains(event.target) && !toggle.contains(event.target)) close();
+		});
+
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape') close();
+		});
+	}
+</script>
