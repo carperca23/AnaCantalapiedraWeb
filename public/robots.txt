@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://cantalapiedraana.com/sitemap-index.xml

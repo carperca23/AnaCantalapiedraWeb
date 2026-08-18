@@ -583,10 +583,31 @@ p {
 	text-decoration: underline;
 }
 
+.site-footer__copyright {
+	margin-top: var(--space-3);
+	text-align: center;
+	font-family: var(--font-body);
+	font-size: 0.8rem;
+	color: var(--color-primary);
+	opacity: 0.6;
+}
+
+.site-footer__copyright a {
+	color: inherit;
+	opacity: 1;
+	text-decoration: underline;
+	text-decoration-color: currentColor;
+	transition: opacity 0.2s ease;
+}
+
+.site-footer__copyright a:hover {
+	opacity: 0.7;
+}
+
 /* Small, muted credit line — separated from the artist's own contact
    details above so it reads as site metadata, not part of her voice. */
 .site-footer__credit {
-	margin-top: var(--space-3);
+	margin-top: var(--space-2);
 	padding-top: var(--space-2);
 	border-top: 1px solid var(--color-secondary);
 	text-align: center;
